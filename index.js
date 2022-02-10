@@ -51,4 +51,4 @@ bot.command('add', context=> {
         context.reply(`Non hai inserito alcun importo`)
     }
 })
-bot.launch()
+bot.launch();
