@@ -28,6 +28,9 @@ class DatabaseUtilities {
                                                          FROM Users
                                                          WHERE TelegramId='${TelegramId}';`)).length
 
+    addMovement =
+        async (ammount, comment) => (await this.queryRunner(`INSERT INTO Movements(Ammount, Comment ${comment===''?`, `:``})VALUES ('${ammount}', ${comment===''?`, `:``})RETURNING MovementId;`))
+
 }
 
 module.exports = DatabaseUtilities;

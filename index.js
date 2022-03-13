@@ -1,10 +1,11 @@
 require("dotenv").config();
 
-const { Telegraf } = require('telegraf')
+const fs = require('fs');
+const Telegraf = require('telegraf')
 const bot = new Telegraf(process.env.TOKEN)
 
 //Connection to the database
-/*const { Pool } = require('pg');
+const { Pool } = require('pg');
 const postgreSQLClient = new Pool({//Pool allows to have more queryes, client just one and then it has to be throw out: https://stackoverflow.com/questions/48751505/how-can-i-choose-between-client-or-pool-for-node-postgres
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -14,7 +15,17 @@ const postgreSQLClient = new Pool({//Pool allows to have more queryes, client ju
 postgreSQLClient.connect();
 const DatabaseUtilities = new require('./dbUtilities');
 DatabaseUtilities.INSTANCE.setConnection(postgreSQLClient);
-console.log("Database connected!");*/
+console.log("Database connected!");
+
+//Commands adding
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));//This next step is how you'll dynamically retrieve all your newly created command files. Add this below your client.commands line:
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    bot.command(command.name, context => {
+        command.execute(context);
+    })
+    bot.commands.set(command.name, command);
+}
 
 bot.start((context) => {
     if(isRegisted(context.update.message.from.id)) {
@@ -28,7 +39,7 @@ bot.start((context) => {
     text=context.update.message.text
     context.reply('Hai scritto: '+text)
 })*/
-bot.command('movements', context=> {
+/*bot.command('movements', context=> {
     //query
 })
 bot.command('add', context=> {
@@ -50,5 +61,5 @@ bot.command('add', context=> {
     }else{
         context.reply(`Non hai inserito alcun importo`)
     }
-})
+})*/
 bot.launch();
