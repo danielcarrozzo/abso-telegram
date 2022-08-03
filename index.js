@@ -1,3 +1,14 @@
+/*import dotenv from 'dotenv' //I need to use import or I cannot import scenes in add, I added "type":"module" in package.json
+dotenv.config();
+
+import fs from 'fs'
+import Telegraf from 'telegraf'
+const bot = new Telegraf(process.env.TOKEN)
+
+//Connection to the database
+import Pool from 'pg'
+* */
+
 require("dotenv").config();
 
 const fs = require('fs');

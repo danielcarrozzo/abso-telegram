@@ -1,17 +1,22 @@
-const { Telegraf }  = require('telegraf')
+const { Telegraf, session, Scenes:{BaseScene, Stage}, Markup }  = require('telegraf')// https://www.youtube.com/watch?v=tsBsVNNqs_U
 //import { Markup } from 'telegraf'
 const DatabaseUtilities = require("../utilities/dbUtilities")
 
-const IN_ACTION=1
-const OUT_ACTION=2
+const IN_ACTION='text'
+const OUT_ACTION='text'
+const CATEGORY_SITUATION='text'
+const NO_CATEGORY_SITUATION='text'
+const COMMENT_SITUATION='text'
+const NO_COMMENT_SITUATION='text'
 
 add =
     async (ctx) => {
         let ammount, category=''
-        const scenarioTypeScene = new Scenes.BaseScene('SCENARIO_TYPE_SCENE_ID');
+        const scenarioTypeScene = new BaseScene('SCENARIO_TYPE_SCENE_ID');
 
         scenarioTypeScene.enter((ctx) => {
             //ctx.session.myData = {};
+            console.log('fghh');
             ctx.reply(`Hai un'entrata o un'uscita?`, Markup.inlineKeyboard([
                 Markup.callbackButton('Entrata', IN_ACTION),
                 Markup.callbackButton('Uscita', OUT_ACTION),
@@ -78,8 +83,13 @@ add =
             ctx.reply('Added correctly!');
         });
 
+        ctx.scene.enter('SCENARIO_TYPE_SCENE_ID')
 // What to do if user entered a raw message or picked some other option?
-        scenarioTypeScene.use((ctx) => ctx.replyWithMarkdown('Please choose either Movie or Theater'));
+        /*scenarioTypeScene.use((ctx) => {
+            console.log('ciao');
+            ctx.reply('Hi');
+            ctx.replyWithMarkdown('Please choose either Movie or Theater')
+        });*/
 
 
 
