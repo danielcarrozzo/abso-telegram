@@ -1,65 +1,57 @@
 require("dotenv").config();
 
 const fs = require('fs');
-const Telegraf = require('telegraf')
+const {Telegraf} = require('telegraf')
 const bot = new Telegraf(process.env.TOKEN)
 
 //Connection to the database
 const { Pool } = require('pg');
 const postgreSQLClient = new Pool({//Pool allows to have more queryes, client just one and then it has to be throw out: https://stackoverflow.com/questions/48751505/how-can-i-choose-between-client-or-pool-for-node-postgres
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: false
+/*{
+    rejectUnauthorized: false
+}*/
 });
-postgreSQLClient.connect();
-const DatabaseUtilities = new require('./dbUtilities');
+
+postgreSQLClient.connect()
+.then(() => console.log("Database connected!"))
+.catch(e => console.log)
+const DatabaseUtilities = new require('./utilities/dbUtilities');
 DatabaseUtilities.INSTANCE.setConnection(postgreSQLClient);
-console.log("Database connected!");
+
+bot.use((ctx, next) => {
+    //console.log(ctx)
+    if(Object.keys(ctx.message).includes('text')){
+        //bot.telegram.sendMessage(-723817505, ctx.from.username + " said: " + ctx.message.text)
+        console.log(ctx.from.username + " said: " + ctx.message.text)
+    } else {
+        //bot.telegram.sendMessage(-723817505, ctx.from.username + " sent " + Object.keys(ctx.message).at(4))
+        console.log(ctx.from.username + " sent " + Object.keys(ctx.message).at(4))
+    }
+    return next()
+})
 
 //Commands adding
+//They are already added embedded in Telegram, not as Discord where you have to declare them in the code
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));//This next step is how you'll dynamically retrieve all your newly created command files. Add this below your client.commands line:
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    bot.command(command.name, context => {
-        command.execute(context);
-    })
-    bot.commands.set(command.name, command);
+    bot.use(command)
+    // bot.command(command.name, ctx => { //Non so perché non funzioni ma ok, guardare moduel export echo.js
+    //     command.execute(ctx);
+    // })
 }
 
-bot.start((context) => {
-    if(isRegisted(context.update.message.from.id)) {
-        context.reply(`Rieccoti ${context.update.message.from.first_name}!`)
+bot.start(async (ctx) => {
+    if(await DatabaseUtilities.INSTANCE.isRegisted(ctx.update.message.from.id)) {
+        ctx.reply(`Rieccoti ${ctx.update.message.from.first_name}!`)
     }else{
-        context.reply(`Ciao ${context.update.message.from.first_name}, sono qui per segnare la tua gestione finanziaria!`)
+        userId=DatabaseUtilities.INSTANCE.addUser(ctx.update.message.from.id)
+        ctx.reply(`Ciao ${ctx.update.message.from.first_name}, sono qui per segnare la tua gestione finanziaria!\n
+                    Nel caso in cui ti servisse assistenza il tuo userId è questo: ${userId}`)
     }
-    console.log(`${context.update.message.from.id} has started`)
+    console.log(`${ctx.update.message.from.id} has started`)
 })
-/*bot.on('text', context=>{
-    text=context.update.message.text
-    context.reply('Hai scritto: '+text)
-})*/
-/*bot.command('movements', context=> {
-    //query
-})
-bot.command('add', context=> {
-    console.log(context)
-    msg=context.update.message
-    content=msg.text.split(' ');
-    if(content.length>1){
-        ammount=Number(content[1])
-        if(ammount){
-            if(content.length>2){
-                comment=content.slice(2).join(' ');
-                context.reply(`Ho aggiunto ${ammount} ai movimenti con commento ${comment}`);
-            }else{
-                context.reply(`Ho aggiunto ${ammount}`);
-            }
-        }else{
-            context.reply(`L'importo inserito non è un numero o non hai utilizzato il '.' per indicare la parte decimale`)
-        }
-    }else{
-        context.reply(`Non hai inserito alcun importo`)
-    }
-})*/
-bot.launch();
+
+bot.launch()
