@@ -1,89 +1,26 @@
-const { Telegraf, session, Scenes:{BaseScene, Stage}, Markup }  = require('telegraf')// https://www.youtube.com/watch?v=tsBsVNNqs_U
-//import { Markup } from 'telegraf'
+const { session, Scenes, Markup }  = require('telegraf')// https://www.youtube.com/watch?v=tsBsVNNqs_U
 const DatabaseUtilities = require("../utilities/dbUtilities")
-
-const IN_ACTION='text'
-const OUT_ACTION='text'
-const CATEGORY_SITUATION='text'
-const NO_CATEGORY_SITUATION='text'
-const COMMENT_SITUATION='text'
-const NO_COMMENT_SITUATION='text'
+const TelegramInterfaceUtilities = new require('../utilities/tgiUtilities');
+let bot = TelegramInterfaceUtilities.INSTANCE.client
 
 add =
     async (ctx) => {
-        let ammount, category=''
-        const scenarioTypeScene = new BaseScene('SCENARIO_TYPE_SCENE_ID');
 
-        scenarioTypeScene.enter((ctx) => {
-            //ctx.session.myData = {};
-            console.log('fghh');
-            ctx.reply(`Hai un'entrata o un'uscita?`, Markup.inlineKeyboard([
-                Markup.callbackButton('Entrata', IN_ACTION),
-                Markup.callbackButton('Uscita', OUT_ACTION),
-            ]).extra());
-        });
+        // Or send your question manually (make sure to use a parse_mode and force_reply!)
+//        bot.command('unicorn', async ctx => ctx.replyWithMarkdown('What are unicorns doing?' + addingQuestion.messageSuffixMarkdown(), {parse_mode: 'Markdown', reply_markup: {force_reply: true}})
+//        bot.command('unicorn', async ctx => ctx.replyWithHTML(    'What are unicorns doing?' + addingQuestion.messageSuffixHTML(),     {parse_mode: 'HTML',     reply_markup: {force_reply: true}})
 
-        scenarioTypeScene.action(IN_ACTION, (ctx) => {
-            ctx.reply(`Inserisci l'importo che hai in entrata (con il punto): `);
-            //ctx.session.myData.preferenceType = 'Theater';
-            if(Number(ctx.message.text)){
-                ammount=Number(parseFloat(ctx.message.text).toFixed(2));
-            }else{
-                ctx.reply(`Non hai inserito un numero valido`);
-                return//TODO
-            }
-            ctx.reply(`Vuoi aggiungere una categoria?`, Markup.inlineKeyboard([
-                Markup.callbackButton('Aggiungi categoria', CATEGORY_SITUATION),
-                Markup.callbackButton('Senza categoria', NO_CATEGORY_SITUATION),
-            ]).extra());
-            //return ctx.scene.enter('INSERT_IN'); // switch to some other scene
-        });
 
-        scenarioTypeScene.action(OUT_ACTION, (ctx) => {
-            ctx.reply(`Inserisci l'importo che hai in uscita (con il punto): `);
-            //ctx.session.myData.preferenceType = 'Theater';
-            if(Number(ctx.message.text)){
-                ammount=-Number(parseFloat(ctx.message.text).toFixed(2));
-            }else{
-                ctx.reply(`Non hai inserito un numero valido`);
-                return
-            }
-            ctx.reply(`Vuoi aggiungere una categoria?`, Markup.inlineKeyboard([
-                Markup.callbackButton('Aggiungi categoria', CATEGORY_SITUATION),
-                Markup.callbackButton('Senza categoria', NO_CATEGORY_SITUATION),
-            ]).extra());
-        });
+        //import { Scenes } from 'telegraf'
 
-        scenarioTypeScene.action(CATEGORY_SITUATION, (ctx) => {
-            category = ctx.message.text;
-            ctx.reply(`Vuoi aggiungere un commento?`, Markup.inlineKeyboard([
-                Markup.callbackButton('Commenta', COMMENT_SITUATION),
-                Markup.callbackButton('Termina qua', NO_COMMENT_SITUATION),
-            ]).extra());
-        });
+        //https://stackoverflow.com/questions/55749437/stage-enter-doesnt-start-the-wizard`
 
-        scenarioTypeScene.action(NO_CATEGORY_SITUATION, (ctx) => {
-            ctx.reply(`Vuoi aggiungere un commento?`, Markup.inlineKeyboard([
-                Markup.callbackButton('Commenta', COMMENT_SITUATION),
-                Markup.callbackButton('Termina qua', NO_COMMENT_SITUATION),
-            ]).extra());
-        });
+        //ctx.scene.enter('SCENARIO_TYPE_SCENE_ID')
 
-        scenarioTypeScene.action(COMMENT_SITUATION, async (ctx) => {
-            await DatabaseUtilities.INSTANCE.addMovement(userid, ammount, category, ctx.message.text);
-            return ctx.scene.leave(); // exit global namespace
-        });
+        //bot.use(session()); // to  be precise, session is not a must have for Scenes to work, but it sure is lonely without one
+//        bot.use(stage.middleware());
 
-        scenarioTypeScene.action(NO_COMMENT_SITUATION, async () => {
-            await DatabaseUtilities.INSTANCE.addMovement(userid, ammount, category, '');
-            return ctx.scene.leave(); // exit global namespace
-        });
-
-        scenarioTypeScene.leave((ctx) => {
-            ctx.reply('Added correctly!');
-        });
-
-        ctx.scene.enter('SCENARIO_TYPE_SCENE_ID')
+//        ctx.scene.enter('SCENARIO_TYPE_SCENE_ID')
 // What to do if user entered a raw message or picked some other option?
         /*scenarioTypeScene.use((ctx) => {
             console.log('ciao');
@@ -116,4 +53,4 @@ add =
     }
 
 
-module.exports = Telegraf.command('add', add);
+module.exports = bot.command('add', (ctx) => ctx.scene.enter('SCENARIO_TYPE_SCENE_ID'));

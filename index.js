@@ -12,8 +12,12 @@ import Pool from 'pg'
 require("dotenv").config();
 
 const fs = require('fs');
-const {Telegraf} = require('telegraf')
+
+const { session, Scenes, Markup, Telegraf} = require('telegraf')
+
 const bot = new Telegraf(process.env.TOKEN)
+const TelegramInterfaceUtilities = new require('./utilities/tgiUtilities');
+TelegramInterfaceUtilities.INSTANCE.setClient(bot);
 
 //Connection to the database
 const { Pool } = require('pg');
@@ -30,6 +34,8 @@ postgreSQLClient.connect()
 .catch(e => console.log)
 const DatabaseUtilities = new require('./utilities/dbUtilities');
 DatabaseUtilities.INSTANCE.setConnection(postgreSQLClient);
+
+//bot.use(session) //boh perché la devo marcare così?
 
 bot.use((ctx, next) => {
     //console.log(ctx)
@@ -53,6 +59,19 @@ for (const file of commandFiles) {
     //     command.execute(ctx);
     // })
 }
+
+//Scenes adding
+let scenes=[]
+const sceneFiles = fs.readdirSync('./scenes').filter(file => file.endsWith('.js'));//This next step is how you'll dynamically retrieve all your newly created command files. Add this below your client.commands line:
+for (const file of sceneFiles) {
+    const scene = require(`./scenes/${file}`);
+    scenes.push(scene)
+    console.log(scene)
+}
+const stage = new Scenes.Stage(scenes)
+console.log(stage)
+bot.use(session());// to  be precise, session is not a must have for Scenes to work, but it sure is lonely without one
+bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
     if(await DatabaseUtilities.INSTANCE.isRegisted(ctx.update.message.from.id)) {
