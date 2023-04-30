@@ -1,4 +1,5 @@
-const { Telegraf }  = require('telegraf')
+const TelegramInterfaceUtilities = new require('../utilities/tgiUtilities');
+let bot = TelegramInterfaceUtilities.INSTANCE.client
 
 echo =
     async (ctx) =>{
@@ -10,4 +11,4 @@ echo =
     //execute: echo
 )*/
 
-module.exports = Telegraf.command('echo', echo);
+module.exports = bot.command('echo', echo);

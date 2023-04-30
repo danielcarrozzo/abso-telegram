@@ -33,12 +33,14 @@ class DatabaseUtilities {
                                                          WHERE TelegramId='${TelegramId}';`)).length
 
     addMovement =
-        async (userid, ammount, category, comment) => (await this.queryRunner(`INSERT INTO Movements(UserId, MoneyAmmount, Category ${category===''?`, `:``}, Comment ${comment===''?`, `:``})VALUES ('${userid}', '${ammount}', ${category===''?`, `:``}, ${comment===''?`, `:``})RETURNING MovementId;`))
+        async (userid, amount, category, comment) => (await this.queryRunner(`INSERT INTO Movements(UserId, Moneyamount ${category===null?`, Category`:``} ${comment===null?`, Comment`:``})
+                                                                                    VALUES ('${userid}', '${amount}', ${category===null?`null`:`'${category}'`}, ${comment===null?`null`:`${comment}`})
+                                                                                    RETURNING MovementId;`))
 
     getUserId =
         async TelegramId => (await this.queryRunner(`SELECT UserId
                                                          FROM Users
-                                                         WHERE TelegramId='${TelegramId}';`))[0]
+                                                         WHERE TelegramId='${TelegramId}';`))[0].userid
 
     getUser =
         async UserId => (await this.queryRunner(`SELECT *

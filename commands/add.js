@@ -52,5 +52,22 @@ add =
         }*/
     }
 
-
-module.exports = bot.command('add', (ctx) => ctx.scene.enter('SCENARIO_TYPE_SCENE_ID'));
+//TODO add
+module.exports = bot.command('add', async (ctx) => {
+    ctx.session.movementData={}
+    ctx.session.userid={}
+    //using the same context here, in other cases is not a good idea if the questions logical dependent by the others
+    //    await ctx.scene.enter('AMOUNT_ADD_SCENE')
+    //    await ctx.scene.enter('CATEGORY_ADD_SCENE')
+    //    await ctx.scene.enter('COMMENT_ADD_SCENE')
+    //così non funziona, le devo mettere di seguito
+    scenesToDo=[]
+    scenesToDo.push('AMOUNT_ADD_SCENE')
+    scenesToDo.push('CATEGORY_ADD_SCENE')
+    scenesToDo.push('COMMENT_ADD_SCENE')
+    scenesToDo.push('QUERY_ADD_SCENE')
+    ctx.session.scenestodo=scenesToDo
+    ctx.session.userid = await DatabaseUtilities.INSTANCE.getUserId(ctx.from.id)
+    console.log(ctx.session.userid)
+    ctx.scene.enter('AMOUNT_ADD_SCENE')
+});
