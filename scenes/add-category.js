@@ -19,21 +19,18 @@ class CategoryAddScene{
         });
 
         categoryAddScene.action('CATEGORY_SITUATION', async (ctx) => {
-            console.log('ciao3')
             ctx.reply(`Inserisci la categoria:`);
-            bot.on('text', async (ctx) => {
-                console.log('ciao4')
+            categoryAddScene.on('text', async (ctx) => {
                 ctx.session.movementData.category = ctx.message.text;
-                await ctx.scene.enter(`COMMENT_ADD_SCENE`)
+                sceneFlow(ctx)
 //                sceneFlow(ctx)
             });
-            bot.on('message', (ctx) => ctx.reply(`Sto aspettando una categoria`))
+            categoryAddScene.on('message', (ctx) => ctx.reply(`Sto aspettando una categoria`))
         });
 
         categoryAddScene.action('NO_CATEGORY_SITUATION', async (ctx) => {
-            console.log('ciao5')
             ctx.session.movementData.category = null;
-            await ctx.scene.enter(`COMMENT_ADD_SCENE`)
+            sceneFlow(ctx)
             //await sceneFlow(ctx)
         });
 

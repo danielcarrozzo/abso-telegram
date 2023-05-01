@@ -72,22 +72,23 @@ for (const file of sceneFiles) {
     //here I start all hooks and middleware for every scene, I return them and adding to the stage
     const scene = (new sceneImported()).creator()//TODO generalize this using constructor, moving scene= in construcotr, returning the scene using the constructor
     scenes.push(scene)
-    console.log('Scena:\n')
-    console.log(scene)
+    console.log(`File ${file} has been fetched and the scene has been considered!`);
+//    console.log('Scena:\n')
+//    console.log(scene)
 }
-console.log('Scene:\n')
-console.log(scenes)
+//console.log('Scene:\n')
+//console.log(scenes)
 
 
-//const sceneImported = require(`./scenes/add-scene.js`);
+
 //const midScene = new sceneImported()
 //const scene = midScene.creator()
-//const stage = new Scenes.Stage([scene])
 
+//const sceneImported = require(`./scenes/add-backup.js`);
+//const scenesimpo = (new sceneImported).creator()
+//const stage = new Scenes.Stage(scenesimpo)
 const stage = new Scenes.Stage(scenes)
-console.log('Stage:\n')
-console.log(stage)
-
+console.log(`Stage added successfully`);
 bot.use(session());// to  be precise, session is not a must have for Scenes to work, but it sure is lonely without one
 bot.use(stage.middleware());
 
@@ -97,7 +98,7 @@ bot.use(stage.middleware());
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));//This next step is how you'll dynamically retrieve all your newly created command files. Add this below your client.commands line:
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    console.log(file);
+    console.log(`File ${file} has been fetched and the command has been added!`);
     //    bot.use((command, next)=> {
     //        command;
     //        return next;
@@ -144,6 +145,7 @@ bot.start(async (ctx) => {
         ctx.reply(`Rieccoti ${ctx.update.message.from.first_name}!`)
     }else{
         let userId = await DatabaseUtilities.INSTANCE.addUser(ctx.update.message.from.id)
+        console.log(userId)
         ctx.reply(`Ciao ${ctx.update.message.from.first_name}, sono qui per segnare la tua gestione finanziaria!\n
                     Nel caso in cui ti servisse assistenza il tuo userId è questo: ${userId}`)
     }

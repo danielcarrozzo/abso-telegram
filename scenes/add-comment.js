@@ -20,16 +20,17 @@ class CommentAddScene{
         });
 
         commentAddScene.action('COMMENT_SITUATION', async (ctx) => {
-            bot.on('text', async (ctx) => {
+            ctx.reply(`Inserisci il commento:`);
+            commentAddScene.on('text', async (ctx) => {
                 ctx.session.movementData.comment = ctx.message.text
-                await sceneFlow(ctx) // exit global namespace
+                sceneFlow(ctx) // exit global namespace
             });
-            bot.on('message', (ctx) => ctx.reply(`Sto aspettando un commento`))
+            commentAddScene.on('message', (ctx) => ctx.reply(`Sto aspettando un commento`))
         });
 
         commentAddScene.action('NO_COMMENT_SITUATION', async (ctx) => {
             ctx.session.movementData.comment = null
-            await sceneFlow(ctx) // exit global namespace
+            sceneFlow(ctx) // exit global namespace
         });
 
         return commentAddScene

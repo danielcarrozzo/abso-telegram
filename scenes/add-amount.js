@@ -20,11 +20,11 @@ class AmountAddScene{
 
         amountAddScene.action('IN_ACTION', async (ctx) => {
             ctx.reply(`Inserisci l'importo che hai in entrata (con il punto): `);
-            bot.on('text', async (ctx) => {
+            amountAddScene.on('text', async (ctx) => {
                 if(Number(ctx.message.text)){
                     console.log('ciao')
                     ctx.session.movementData.amount = Number(parseFloat(ctx.message.text).toFixed(2));
-                    await ctx.scene.enter(`CATEGORY_ADD_SCENE`)
+                    sceneFlow(ctx)
                     //sceneFlow(ctx)
                 }else{
                     console.log('ciao2')
@@ -37,11 +37,11 @@ class AmountAddScene{
 
         amountAddScene.action('OUT_ACTION', async (ctx) => {
             ctx.reply(`Inserisci l'importo che hai in uscita (con il punto): `);
-            bot.on('text', async (ctx) => {
+            amountAddScene.on('text', async (ctx) => {
                 if(Number(ctx.message.text)){
                     ctx.session.movementData.amount=-Number(parseFloat(ctx.message.text).toFixed(2));
-                    //return ctx//ctx.scene.enter('CATEGORY_ADD_SCENE')
-                    await sceneFlow(ctx)
+                    sceneFlow(ctx)
+                    //await sceneFlow(ctx)
                 }else{
                     ctx.reply(`Non hai inserito un numero valido`);
                     await ctx.scene.reenter()//ma in realtà forse non serve

@@ -18,6 +18,7 @@ class DatabaseUtilities {
         this.queryRunner(`SELECT * FROM movements`)
     }
 
+    //TODO avoid query injection https://planetscale.com/blog/how-to-prevent-sql-injection-attacks-in-node-js
     queryRunner =
         async (query) => {
             console.log(query);
@@ -25,7 +26,7 @@ class DatabaseUtilities {
         }
 
     addUser =
-        async (telegramId) => (await this.queryRunner(`INSERT INTO Users(TelegramId)VALUES ('${telegramId}')RETURNING UserId;`))
+        async (telegramId) => (await this.queryRunner(`INSERT INTO Users(TelegramId)VALUES ('${telegramId}')RETURNING UserId;`))[0].userid
 
     isRegisted =
         async TelegramId => (await this.queryRunner(`SELECT UserId
@@ -33,8 +34,8 @@ class DatabaseUtilities {
                                                          WHERE TelegramId='${TelegramId}';`)).length
 
     addMovement =
-        async (userid, amount, category, comment) => (await this.queryRunner(`INSERT INTO Movements(UserId, Moneyamount ${category===null?`, Category`:``} ${comment===null?`, Comment`:``})
-                                                                                    VALUES ('${userid}', '${amount}', ${category===null?`null`:`'${category}'`}, ${comment===null?`null`:`${comment}`})
+        async (userid, amount, category, comment) => (await this.queryRunner(`INSERT INTO Movements(UserId, Moneyamount ${category===null?``:`, Category`} ${comment===null?``:`, Comment`})
+                                                                                    VALUES ('${userid}', '${amount}' ${category===null?``:`, '${category}'`} ${comment===null?``:`, '${comment}'`})
                                                                                     RETURNING MovementId;`))
 
     getUserId =
